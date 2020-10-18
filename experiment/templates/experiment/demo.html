@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Reward Maximization Game</title>
+
+  <!-- CSS  -->
+  <link href="{% static 'experiment/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'experiment/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <style type="text/css">
+    .btn-block {width: 108%; margin: 5px 0px; height: 75px;}
+    .notes {
+      list-style-type: disc !important;
+      margin-left: 2em
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    {% if page == -1 %}
+        <b>
+        Notes: 
+          <ul>
+            <li class="notes">Before the task begins, this HIT will check for duplicate worker IDs to ensure participants in the study are unique.</li>
+          </ul>
+        </b>
+        <p>Your task is to play a simple game consisting of {{ n_iterations | add:"1" }} rounds. Your goal is to score as many points as possible — you will receive a bonus at a rate of $1.00 per {{ pts_per_dollar }} points.</p>
+
+        <p>In each round, you will select {{ k }} elements from the items in front of you. Each item has an <i>estimated</i> value and a <i>true</i> value. The numbers on each of the items at the beginning of the round are estimated values. The true values of selected items will be revealed at the end of each round. <b>Try to select the items with the greatest {{ k }} <i>true</i> values. 
+        {% if l > 0 %}
+          At least {{ l }} of your selections in each round must be blue.
+        {% endif %}
+        </b> Over time, you may be able to detect patterns which will help you earn higher scores.</p>
+
+        <p>Your score for each round is the sum of the true values of the items you selected. Continue to the next page to see a demonstration.</p>
+      
+    </div>
+    {% endif %}
+    {% if page == 0 %}
+      <div class="section">
+        <p>As an example, look at the following items from a similar task. The items each have an <i>estimated</i> value and a <i>true</i> value.</p>
+
+        <p>The numbers shown on each of the items are estimated values. Select an item to see its true value. (After this demo, you won't see the true value until after you submit your selections.) When you have selected the 3 items with the highest true values, you can proceed to the game by selecting "Done".</p>
+      </div>
+      <div class="section">
+        <div class="row">
+          <div class="col s12" style="position:relative;">
+            {% for i, num_str in cands_demo %}
+              <div class="col s2" style="position:relative;">
+                <button type="button" id="btn_demo{{i}}" onclick="demo_select({{ i }})" class="btn-block deep-orange darken-3 btn-flat white-text" style="font-weight: bold; border-style: solid; font-size: 18px;">{{ num_str }}</button>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="container"> 
+        <div class="row"> 
+            <div class="col s12 m12">
+              <div class="card grey lighten-2">
+                <div class="card-title center">
+                  <div id="outcomes_game_num">Score</div> 
+                </div>
+                <div class="card-content left-align">
+                  <div id="outcomes_estimated" style='font-size: 20px;'>Estimated points: <span id="perc_total_demo"></span></div> 
+                  <div id="outcomes_actual" style='font-size: 20px;'>True points: <span id="true_total_demo"></span></div> 
+                  <div id="bonus" style='font-size: 20px;'>Bonus: <span id="bonus_total_demo"></span></div> 
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {{ true_demo|json_script:"true_demo" }}
+  {{ perc_demo|json_script:"perc_demo" }}
+  {{ n_demo|json_script:"n_demo" }}
+  {{ pts_per_dollar|json_script:"pts_per_dollar" }}
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script> -->
+  <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script> -->
+  <script type="text/javascript" src="{% static 'experiment/materialize.min.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'experiment/demo.js' %}"></script> 
+  </body>
+</html>

@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Reward Maximization Game</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="{% static 'experiment/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'experiment/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <style type="text/css">
+    .btn-block {width: 108%; margin: 5px 0px; height: 75px;}
+    .notes {
+      list-style-type: disc !important;
+      margin-left: 2em
+    }
+    iframe {
+      margin: 0;
+      padding: 0;
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+    .modal {
+      width: 75%;
+    }
+  </style>
+</head>
+
+<body>
+  
+  {# SIDENAV #}
+  <ul id="slide-out" class="sidenav">
+    <li><div class="user-view">
+      <div class="background"></div>
+    </div></li>
+    <li><h4 style="margin: 0px 33px 20px 33px;">Instructions<a style="float:right;" class="sidenav-close" href="#!"><i class="material-icons">close</i></a></h4> </li>
+    <li><div class="divider"></div></li>
+    <li><a class="modal-trigger blue-text" href="#modal1" style="font-weight: bold; margin: 10px 0px 0px 0px;">View complete instructions</a></li>
+    <div class="card-content" style="margin: 0px 33px 33px 33px;">
+        <p>Read the complete instructions above carefully and inspect the grid.</p>
+    </div>
+    <div class="card-content" style="margin: 0px 33px 0px 33px;">
+        <p>The items each have an <i>estimated</i> value and a <i>true</i> value. The numbers on each of the items at the beginning of the round are estimated values. The true values of selected items will be revealed at the end of each round. <b>Try to select the items with the greatest {{ k }} <i>true</i> values. 
+        {% if l > 0 %}
+          At least {{ l }} of your selections in each round must be blue.
+        {% endif %}
+        </b></p>
+    </div>
+  </ul>
+
+  <div id="modal1" class="modal">
+    <div class="modal-content" id="modal-content">
+      <button type="button" style="float: right;" class="waves-effect waves-green btn-flat" id="next_btn">NEXT</button>
+      <h4 style="clear:none;">Complete Instructions</h4>
+      <div id="modal-body">
+      </div>
+    </div>
+  </div>
+  
+  <form id="form" action="{{ external_submit_url }}" method="POST">
+  {# HEADER #}
+  <div class="no-pad-bot" id="index-banner">
+    <div class="row">
+      <div class="col m3">
+        <div style="margin:25px">
+          <a class="btn-floating btn waves-effect waves-light sidenav-trigger" data-target="slide-out" href="#"><i class="material-icons blue text-darken-4">menu</i></a>
+        </div>
+      </div>
+      <div class="col m6">
+          <h3 class="center">Reward Maximization Game</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <div class="row">
+
+        {# candidate buttons #}
+        <div class="col s12 m12">
+          <div class="icon-block left-align" style="overflow: scroll; height: 450px;" id="candidate_buttons">
+            {% for i, num_str, is_x, num in cands %}
+              <div class="col s2" id="btn{{ i }}" style="position:relative;">
+                {% if is_x %}
+                  <button type="button" onclick="select({{ i }})" id="{{ i }}" class="btn-block blue darken-4 btn-flat white-text" style="font-weight: bold; border-style: solid; font-size: 18px;">{{ num_str }}</button>
+                {% else %}
+                  <button type="button" onclick="select({{ i }})" id="{{ i }}" class="btn-block deep-orange darken-3 btn-flat white-text" style="font-weight: bold; border-style: solid; font-size: 18px;">{{ num_str }}</button>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div> <!-- row valign-wrapper -->
+
+    </div>
+    <div class="row center valign-wrapper">
+      <div class="col s9">
+        <div id="plot" ></div>
+      </div>
+      <div class="col s3 m3"> 
+          <button type="button" onclick="" id="btn_submit" class="btn-large green disabled" style="height:100%;"><i class="material-icons">arrow_forward</i></button> 
+        <p id='n_iterations_remaining'>Remaining rounds: {{ n_iterations }}<br></p>  
+        <button type="button" onclick="exit_early()" id="btn_submit" class="btn-large btn-flat grey darken-3 white-text" style="height:100%;"><p style="line-height:100%;">Exit study <br> (no return)</p></button> 
+      </div>
+    </div>
+  </div>
+
+  <div class="container"> 
+    <div class="row center"> 
+        <div class="col s6">
+          <div class="card grey lighten-2">
+            <div class="card-title ">
+              <div id="outcomes_game_num">Round #1</div> 
+            </div>
+            <div class="card-content left-align">
+              <div id="outcomes_estimated" style='font-size: 20px;'>Estimated points: </div> 
+              <div id="outcomes_actual" style='font-size: 20px;'>True points: </div> 
+            </div>
+          </div>
+        </div>
+        <div class="col s6">
+          <div class="card grey lighten-2">
+            <div class="card-title ">
+              <div >Overall</div> 
+            </div>
+            <div class="card-content left-align">
+              <p id="cumulative_points" style='font-size: 20px;'>Cumulative points: 0</p>
+              <p id="cumulative_bonus" style='font-size: 20px;'>Cumulative bonus: $0.00</div></p>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Template data-->
+  {{ n_x|json_script:"n_x" }}
+  {{ n_y|json_script:"n_y" }}
+  {{ k|json_script:"k" }}
+  {{ l|json_script:"l" }}
+  {{ is_x|json_script:"is_x" }}
+  {{ n_iterations|json_script:"n_iterations" }}
+  {{ bias|json_script:"bias" }}
+  {{ assignment_id|json_script:"assignment_id" }}
+  {{ hit_id|json_script:"hit_id" }}
+  {{ worker_id|json_script:"worker_id" }}
+  {{ pts_per_dollar|json_script:"pts_per_dollar" }}
+  {{ db_entry_id|json_script:"db_entry_id" }}
+  {{ round_completion_time|json_script:"round_completion_time" }}
+  {{ is_restore|json_script:"is_restore" }}
+  {{ selected_restore|json_script:"selected_restore" }}
+  {{ db_entry_id_restore|json_script:"db_entry_id_restore" }}
+  {{ round_completion_time_restore|json_script:"round_completion_time_restore" }}
+  {{ true_utility_restore|json_script:"true_utility_restore" }}
+
+  <!-- Baseline form inputs-->
+  <input type="hidden" name="assignmentId" id="assignmentId" value="{{ assignment_id }}">
+  <input type="hidden" name="workerId" id="workerId" value="{{ worker_id }}">
+  <input type="hidden" name="hitId" id="hitId" value="{{ hit_id }}">
+  <input type="hidden" name="l" id="l" value="{{ l }}">
+  <input type="hidden" name="n_x" id="n_x" value="{{ n_x }}">
+  <input type="hidden" name="n_y" id="n_y" value="{{ n_y }}">
+  <input type="hidden" name="k" id="k" value="{{ k }}">
+  <input type="hidden" name="bias" id="bias" value="{{ bias }}">
+  <input type="hidden" name="startTime" id="startTime">
+  <input type="hidden" name="endTime" id="endTime">
+  </form>
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script> -->
+  <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script> -->
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script type="text/javascript" src="{% static 'experiment/materialize.min.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'experiment/state_vars.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'experiment/plot.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'experiment/iteration.js' %}"></script> 
+  </body>
+</html>

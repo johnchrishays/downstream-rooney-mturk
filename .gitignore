@@ -1,0 +1,9 @@
+**/__pycache__
+.env
+db.sqlite3
+.DS_Store
+results_local.pkl
+results.heroku.pkl
+db.sqlite3
+mturk-manage-2019-12-06
+postgres_archive_Sept_5_2020
