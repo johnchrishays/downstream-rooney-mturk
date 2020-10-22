@@ -1,5 +1,7 @@
 # Amazon Mechanical Turk Experiment for "The Effect of the Rooney Rule on Implicit Bias in the Long Term"
 
+This experiment was run using participants recruited from Amazon Mechanical Turk. Results were published in the paper ["The Effect of the Rooney Rule on Implicit Bias in the Long Term"](https://arxiv.org/abs/2010.10992).
+
 To run the web application:
 
 1. Fork or clone this repo.  
@@ -21,7 +23,7 @@ in the directory where you cloned the repo.
 export DATABASE_URL="$(heroku config:get DATABASE_URL -a downstreamrooney)"
 ```  
 
-7. To make view the application locally, you can run
+7. To view the application locally, you can run
 ```
 python manage.py runserver
 ```
