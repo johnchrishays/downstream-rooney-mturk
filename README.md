@@ -1,6 +1,6 @@
 # Amazon Mechanical Turk Experiment for "The Effect of the Rooney Rule on Implicit Bias in the Long Term"
 
-This experiment was run using participants recruited from Amazon Mechanical Turk. Results were published in the paper ["The Effect of the Rooney Rule on Implicit Bias in the Long Term"](https://arxiv.org/abs/2010.10992).
+This experiment was run using participants recruited from Amazon Mechanical Turk. Results are reported in the paper ["The Effect of the Rooney Rule on Implicit Bias in the Long Term"](https://arxiv.org/abs/2010.10992).
 
 To run the web application:
 
