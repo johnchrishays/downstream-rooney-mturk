@@ -1,6 +1,6 @@
 # Amazon Mechanical Turk Experiment for "The Effect of the Rooney Rule on Implicit Bias in the Long Term"
 
-This experiment was run using participants recruited from Amazon Mechanical Turk. Results are reported in the paper ["The Effect of the Rooney Rule on Implicit Bias in the Long Term"](https://arxiv.org/abs/2010.10992).
+This is the code for an iterative candidate selection experiment conducted on Amazon Mechanical Turk. Results from the experiment are reported in the paper ["The Effect of the Rooney Rule on Implicit Bias in the Long Term"](https://arxiv.org/abs/2010.10992).
 
 To run the web application:
 
